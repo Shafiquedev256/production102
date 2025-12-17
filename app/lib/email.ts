@@ -111,7 +111,7 @@ export async function sendAffiliateVerificationEmail(
   token: string,
   fullName: string
 ) {
-  const verifyUrl = `${APP_URL}/api/auth/affiliate/verify-email?token=${token}`;
+  const verifyUrl = `${APP_URL}/api/auth/affiliate/verify?token=${token}`;
 
   const subject = "Verify your affiliate account";
 

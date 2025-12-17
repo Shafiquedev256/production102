@@ -34,11 +34,8 @@ export async function GET(req: Request) {
     seller.status = "active";
 
     await seller.save();
-
-    return NextResponse.json({
-      success: true,
-      message: "Email verified successfully. You can now login.",
-    });
+    
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/seller/verify-success`);
   } catch (err) {
     console.error("EMAIL_VERIFY_ERROR:", err);
     return NextResponse.json(
