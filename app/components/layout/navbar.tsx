@@ -89,7 +89,7 @@ export default function Navbar({ scrolled }: NavbarProps) {
           {/* CTA Buttons */}
           <div className='hidden lg:flex items-center space-x-4'>
             <Link
-              href='/seller/login'
+              href='/auth/seller/login'
               className={`px-6 py-2.5 border-2 border-primary mx-2 rounded-lg font-medium transition-all whitespace-nowrap ${
                 scrolled
                   ? "text-dark hover:bg-gray-100"
