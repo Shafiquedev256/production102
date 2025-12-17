@@ -50,7 +50,7 @@ export default function HeroSection() {
               {/* Action Buttons */}
               <div className='flex flex-wrap gap-4 pt-4'>
                 <Link
-                  href='/seller/signup'
+                  href='/auth/seller/signup'
                   className='px-8 py-4 bg-linear-to-r from-primary to-secondary text-white rounded-lg font-semibold text-lg hover:shadow-2xl hover:scale-105 transition-all whitespace-nowrap'
                 >
                   Start Selling
