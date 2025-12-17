@@ -28,7 +28,6 @@ export async function GET(req: Request) {
       );
     }
 
-    // ✅ Update seller verification status
     seller.isEmailVerified = true;
     seller.emailVerificationToken = undefined;
     seller.emailVerificationExpires = undefined;
@@ -36,23 +35,10 @@ export async function GET(req: Request) {
 
     await seller.save();
 
-    // ✅ Ensure NEXT_PUBLIC_BASE_URL exists
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-    if (!baseUrl) {
-      console.error("EMAIL_VERIFY_ERROR: NEXT_PUBLIC_BASE_URL is not set");
-      return NextResponse.json(
-        { success: false, message: "Server configuration error" },
-        { status: 500 }
-      );
-    }
-
-    // ✅ Construct absolute URL for redirect
-    const redirectUrl = new URL(
-      "/auth/seller/verify-success",
-      baseUrl
-    ).toString();
-
-    return NextResponse.redirect(redirectUrl);
+    return NextResponse.json({
+      success: true,
+      message: "Email verified successfully. You can now login.",
+    });
   } catch (err) {
     console.error("EMAIL_VERIFY_ERROR:", err);
     return NextResponse.json(
