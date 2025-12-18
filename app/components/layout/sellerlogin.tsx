@@ -9,12 +9,30 @@ interface LoginFormData {
   password: string;
 }
 
+// Helper to automatically refresh access token on 401
+async function fetchWithRefresh(url: string, options?: RequestInit) {
+  let res = await fetch(url, { ...options, credentials: "include" });
+
+  if (res.status === 401) {
+    const refreshRes = await fetch("/api/auth/seller/refresh", {
+      method: "POST",
+      credentials: "include",
+    });
+    if (refreshRes.ok) {
+      res = await fetch(url, { ...options, credentials: "include" });
+    } else {
+      window.location.href = "/auth/seller/login";
+    }
+  }
+
+  return res;
+}
+
 export default function SellerLoginPage() {
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(
     null
@@ -38,6 +56,7 @@ export default function SellerLoginPage() {
       const res = await fetch("/api/auth/seller/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // HttpOnly cookies
         body: JSON.stringify(formData),
       });
 
@@ -46,7 +65,11 @@ export default function SellerLoginPage() {
       if (res.ok && result.success) {
         setSubmitStatus("success");
         setMessage("Login successful! Redirecting...");
-        setTimeout(() => router.push("/seller/dashboard"), 1000);
+
+        // Preload seller data to trigger automatic refresh if needed
+        await fetchWithRefresh("/api/seller/me");
+
+        setTimeout(() => router.push("/seller/dashboard"), 500);
       } else if (res.status === 403) {
         setSubmitStatus("error");
         setMessage("Email not verified. Please verify first.");
@@ -86,14 +109,13 @@ export default function SellerLoginPage() {
             <div className='w-16 h-16 bg-linear-to-br from-orange-500 to-amber-500 rounded-full flex items-center justify-center mx-auto mb-4'>
               <i className='ri-store-2-line text-3xl text-white'></i>
             </div>
-
             <h1 className='text-3xl font-bold text-gray-900 mb-2'>
               Welcome Back
             </h1>
             <p className='text-gray-600'>Login to your seller account</p>
           </div>
 
-          {/* Success / Error Alerts */}
+          {/* Alerts */}
           {submitStatus === "success" && (
             <div className='mb-6 p-4 bg-green-50 border border-green-200 rounded-lg'>
               <p className='text-green-800 text-sm flex items-center'>
@@ -102,7 +124,6 @@ export default function SellerLoginPage() {
               </p>
             </div>
           )}
-
           {submitStatus === "error" && (
             <div className='mb-6 p-4 bg-red-50 border border-red-200 rounded-lg'>
               <p className='text-red-800 text-sm flex items-center'>
@@ -124,7 +145,6 @@ export default function SellerLoginPage() {
               required
               className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none'
             />
-
             <input
               type='password'
               placeholder='Password'
@@ -135,12 +155,10 @@ export default function SellerLoginPage() {
               required
               className='w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none'
             />
-
             <button
               type='submit'
               disabled={isSubmitting}
-              className={`w-full py-3 rounded-lg text-white font-semibold transition 
-              ${
+              className={`w-full py-3 rounded-lg text-white font-semibold transition ${
                 isSubmitting
                   ? "bg-orange-400 cursor-not-allowed"
                   : "bg-orange-600 hover:bg-orange-700"
@@ -159,7 +177,6 @@ export default function SellerLoginPage() {
               >
                 Resend verification email
               </button>
-
               {resendStatus === "success" && (
                 <p className='text-green-600 text-sm mt-2'>
                   Verification email sent!

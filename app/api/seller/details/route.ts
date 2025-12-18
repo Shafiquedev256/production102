@@ -1,32 +1,27 @@
-// app/api/seller/me/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { dbConnect } from "../../../lib/mongoose";
-import Seller from "../../../models/sellers";
-import { verifyJwt } from "../../../lib/auth";
+import { dbConnect } from "@/app/lib/mongoose";
+import Seller from "@/app/models/sellers";
+import { verifyAccessToken } from "@/app/lib/jwt";
 
 export async function GET(req: NextRequest) {
   try {
     await dbConnect();
 
-    const token = req.cookies.get("token")?.value;
+    const token = req.cookies.get("accessToken")?.value;
     if (!token)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    let payload: any;
+    let payload;
     try {
-      payload = verifyJwt(token);
+      payload = verifyAccessToken(token);
     } catch {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    if (!payload.sellerId)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-    const seller = await Seller.findById(payload.sellerId).lean();
+    const seller = await Seller.findById(payload.sub).lean();
     if (!seller)
       return NextResponse.json({ error: "Seller not found" }, { status: 404 });
 
-    // Remove sensitive fields
     const {
       password,
       emailVerificationToken,
