@@ -54,7 +54,10 @@ export const useSeller = () => {
   return useQuery<ISeller, Error>({
     queryKey: ["seller"],
     queryFn: async () => {
-      const res = await fetch("/api/seller/details");
+      const res = await fetch("/api/seller/details", {
+        method: "GET",
+        credentials: "include",
+      });
       const data = await res.json();
       if (!res.ok || !data.success) {
         throw new Error(data.error || "Failed to fetch seller");

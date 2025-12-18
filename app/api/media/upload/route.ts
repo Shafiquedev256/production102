@@ -10,48 +10,49 @@ import {
   bytesToMB,
   getKind,
 } from "../../../lib/mediaProcessor";
-import { verifyJwt } from "../../../lib/auth";
+import { verifyAccessToken } from "../../../lib/jwt";
 
 export const runtime = "nodejs";
 
-function getTokenFromCookie(header: string | null): string | null {
-  if (!header) return null;
-  const match = header.match(/token=([^;]+)/);
-  return match ? match[1] : null;
-}
-
 export async function POST(req: NextRequest) {
   try {
-    await dbConnect(); // Ensure DB connection
+    await dbConnect();
 
-    const token = getTokenFromCookie(req.headers.get("cookie"));
+    // -----------------------------
+    // Extract token from server-side cookies
+    // -----------------------------
+    const token = req.cookies.get("token")?.value;
     if (!token)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    let payload: any;
+    // -----------------------------
+    // Verify token
+    // -----------------------------
+    let payload;
     try {
-      payload = verifyJwt(token);
+      payload = verifyAccessToken(token);
     } catch {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    if (!payload.sellerId)
+    // -----------------------------
+    // Find seller
+    // -----------------------------
+    const seller = await Seller.findById(payload.sub);
+    if (!seller)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const seller = await Seller.findById(payload.sellerId);
-
+    // -----------------------------
+    // Parse formData
+    // -----------------------------
     const formData = await req.formData();
     let productId = req.headers.get("x-product-id");
     let product;
 
-    // -----------------------------
-    // Create product if not provided
-    // -----------------------------
     if (productId) {
       product = await Product.findById(productId);
-      if (!product || product.sellerId.toString() !== seller._id.toString()) {
+      if (!product || product.sellerId.toString() !== seller._id.toString())
         return NextResponse.json({ error: "Invalid product" }, { status: 403 });
-      }
     } else {
       const title = formData.get("title")?.toString() || "Untitled Product";
       const description =
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
       const currency = formData.get("currency")?.toString() || "USD";
       const price = parseFloat(formData.get("price")?.toString() || "0");
 
-      product = new Product({
+      product = await Product.create({
         title,
         description,
         category,
@@ -72,19 +73,16 @@ export async function POST(req: NextRequest) {
         documents: [],
         createdAt: new Date(),
       });
-
-      await product.save();
       productId = product._id.toString();
     }
 
     // -----------------------------
-    // Handle file uploads
+    // Handle files
     // -----------------------------
     const files: File[] = [];
     for (const [, value] of formData.entries()) {
       if (value instanceof File) files.push(value);
     }
-
     if (!files.length)
       return NextResponse.json({ error: "No files provided" }, { status: 400 });
 
@@ -101,7 +99,7 @@ export async function POST(req: NextRequest) {
       const kind = getKind(file.type);
       const sizeMB = bytesToMB(file.size);
 
-      // Seller limits
+      // Check per-file limits
       if (
         (kind === "image" && sizeMB > seller.uploadLimits.maxImageSizeMB) ||
         (kind === "video" && sizeMB > seller.uploadLimits.maxVideoSizeMB)
@@ -112,43 +110,9 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Per-product limits
-      const currentCount =
-        kind === "image"
-          ? product.images.length +
-            uploadedItems.filter((i) => i.kind === "image").length
-          : kind === "video"
-            ? product.videos.length +
-              uploadedItems.filter((i) => i.kind === "video").length
-            : 0;
-
-      if (
-        (kind === "image" &&
-          currentCount >= seller.uploadLimits.maxImagesPerProduct) ||
-        (kind === "video" &&
-          currentCount >= seller.uploadLimits.maxVideosPerProduct)
-      ) {
-        return NextResponse.json(
-          { error: `${kind} limit reached` },
-          { status: 409 }
-        );
-      }
-
-      // Storage quota
-      const totalStorageAfter =
-        seller.storageUsedMB +
-        uploadedItems.reduce((acc, i) => acc + i.sizeMB, 0) +
-        sizeMB;
-      if (totalStorageAfter > seller.storageLimitMB) {
-        return NextResponse.json(
-          { error: "Storage quota exceeded" },
-          { status: 413 }
-        );
-      }
-
-      // Write file
       const uploadDir = path.join(baseDir, `${kind}s`);
       await ensureDir(uploadDir);
+
       const filename = generateFilename(file.name);
       await fs.writeFile(
         path.join(uploadDir, filename),
@@ -165,7 +129,7 @@ export async function POST(req: NextRequest) {
     }
 
     // -----------------------------
-    // Save to DB
+    // Update product DB
     // -----------------------------
     await Product.findByIdAndUpdate(productId, {
       $push: {
@@ -179,6 +143,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // -----------------------------
+    // Update seller storage
+    // -----------------------------
     await Seller.findByIdAndUpdate(seller._id, {
       $inc: {
         storageUsedMB: uploadedItems.reduce((acc, i) => acc + i.sizeMB, 0),

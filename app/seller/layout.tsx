@@ -7,18 +7,19 @@ export default async function SellerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken")?.value;
+  const cooky = await cookies();
+  const token = cooky.get("accessToken")?.value;
 
-  if (!token) {
-    redirect("/auth/seller/login"); // ✅ do NOT wrap in try/catch
+  if (!token) redirect("/auth/seller/login");
+
+  let payload;
+  try {
+    payload = verifyAccessToken(token);
+  } catch {
+    redirect("/auth/seller/login"); // expired or invalid → refresh should happen via client
   }
 
-  // If the token is invalid, redirect — let the exception propagate
-  const payload = verifyAccessToken(token);
-  if (payload.role !== "seller") {
-    redirect("/unauthorized");
-  }
+  if (payload.role !== "seller") redirect("/unauthorized");
 
   return <>{children}</>;
 }

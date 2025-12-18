@@ -1,5 +1,6 @@
 "use client";
 import { useSeller } from "../../../hooks/useSeller";
+import LogoutButton from "../../ui/sellerLogout";
 interface HeaderProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
@@ -36,13 +37,14 @@ export default function Header({ isOpen, setIsOpen }: HeaderProps) {
       {/* User Section */}
       <div className='flex items-center gap-4'>
         <i className='ri-notification-3-line text-xl text-gray-600 cursor-pointer hover:text-gray-800'></i>
-        <div className='flex items-center gap-2'>
+        <div className='flex flex-row items-center gap-2'>
           <div className='w-9 h-9 rounded-full bg-linear-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-sm'>
             JD
           </div>
           <span className='text-sm font-medium text-gray-700 hidden sm:block'>
             {seller?.fullName}
           </span>
+          <LogoutButton />
         </div>
       </div>
     </header>
