@@ -1,9 +1,13 @@
+"use client";
+import Image from "next/image";
+
 interface SidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
 }
+
 export default function Sidebar({
   activeSection,
   setActiveSection,
@@ -18,22 +22,29 @@ export default function Sidebar({
     { id: "settings", label: "Settings", icon: "ri-settings-3-line" },
     { id: "support", label: "Support", icon: "ri-customer-service-line" },
   ];
+
   const handleMenuClick = (id: string) => {
     setActiveSection(id);
     setIsSidebarOpen(false);
   };
+
   return (
     <aside
-      className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+      className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out ${
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      }`}
     >
       <div className='flex flex-col h-full'>
         {/* Logo */}
         <div className='flex items-center justify-between px-6 py-5 border-b border-gray-200'>
-          <img
-            src='https://public.readdy.ai/ai/img_res/017300b4-3dda-4e39-b60b-8d9ca223f16c.png'
-            alt='Logo'
-            className='h-10 w-auto object-contain'
-          />
+          <div className='relative w-32 h-10'>
+            <Image
+              src='https://public.readdy.ai/ai/img_res/017300b4-3dda-4e39-b60b-8d9ca223f16c.png'
+              alt='Logo'
+              fill
+              className='object-contain'
+            />
+          </div>
           <button
             onClick={() => setIsSidebarOpen(false)}
             className='lg:hidden text-gray-500 hover:text-gray-700 cursor-pointer'
@@ -41,6 +52,7 @@ export default function Sidebar({
             <i className='ri-close-line text-2xl'></i>
           </button>
         </div>
+
         {/* Navigation */}
         <nav className='flex-1 px-4 py-6 space-y-2 overflow-y-auto'>
           {menuItems.map((item) => (
@@ -58,6 +70,7 @@ export default function Sidebar({
             </button>
           ))}
         </nav>
+
         {/* User Profile */}
         <div className='px-4 py-4 border-t border-gray-200'>
           <div className='flex items-center gap-3 px-4 py-3 rounded-lg bg-gradient-to-r from-orange-50 to-amber-50'>
