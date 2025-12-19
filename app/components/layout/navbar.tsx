@@ -45,7 +45,7 @@ export default function Navbar({ scrolled }: NavbarProps) {
             <h1
               className={` font-bold ${scrolled ? "text-dark" : "text-white"}`}
             >
-              ndi bloker
+              Proseller
             </h1>
           </Link>
 
