@@ -1,11 +1,11 @@
 "use client";
-import Analytics from "@/app/components/dashboard/seller/Analytics";
-import Header from "@/app/components/dashboard/seller/Header";
-import Overview from "@/app/components/dashboard/seller/overview";
-import Payments from "@/app/components/dashboard/seller/Payments";
-import Products from "@/app/components/dashboard/seller/product";
-import Sidebar from "@/app/components/dashboard/seller/Sidebar";
-import { useProtectedSeller } from "@/app/hooks/useProtectedSeller";
+import Analytics from "../../components/dashboard/seller/Analytics";
+import Header from "../../components/dashboard/seller/Header";
+import Overview from "../../components/dashboard/seller/overview";
+import Payments from "../../components/dashboard/seller/Payments";
+import Products from "../../components/dashboard/seller/product";
+import Sidebar from "../../components/dashboard/seller/Sidebar";
+import { useProtectedSeller } from "../../hooks/useProtectedSeller";
 import { useState } from "react";
 
 export default function Dashboard() {
