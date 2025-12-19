@@ -31,7 +31,7 @@ export interface RefreshTokenPayload extends AccessTokenPayload {
 ===================================================== */
 
 const ACCESS_TOKEN_OPTIONS: SignOptions = {
-  expiresIn: "10m",
+  expiresIn: "1d",
 };
 
 const REFRESH_TOKEN_OPTIONS: SignOptions = {

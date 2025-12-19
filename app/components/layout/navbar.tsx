@@ -37,12 +37,13 @@ export default function Navbar({ scrolled }: NavbarProps) {
       <div className='max-w-7xl mx-auto px-6 lg:px-8'>
         <div className='flex items-center justify-between h-20'>
           {/* Logo */}
-          <Link href='/' className='flex items-center space-x-3'>
+          <Link
+            href='/'
+            className='flex items-center whitespace-nowrap space-x-3'
+          >
             <img src='/logo.png' alt='ndi bloker' className='h-12 w-auto' />
             <h1
-              className={`text-2xl font-bold ${
-                scrolled ? "text-dark" : "text-white"
-              }`}
+              className={` font-bold ${scrolled ? "text-dark" : "text-white"}`}
             >
               ndi bloker
             </h1>
@@ -99,7 +100,7 @@ export default function Navbar({ scrolled }: NavbarProps) {
               Seller Login
             </Link>
             <Link
-              href='/affiliate/login'
+              href='/auth/affiliate/login'
               className='px-6 py-2.5 bg-linear-to-r from-primary to-secondary text-white rounded-lg font-medium hover:shadow-lg transition-all whitespace-nowrap'
             >
               Affiliate Login
@@ -154,13 +155,13 @@ export default function Navbar({ scrolled }: NavbarProps) {
             {/* Mobile CTA Buttons */}
             <div className='pt-4 space-y-2'>
               <Link
-                href='/seller/login'
+                href='/auth/seller/login'
                 className='block w-full text-center px-6 py-2.5 border-2 border-primary text-primary rounded-lg font-medium whitespace-nowrap'
               >
                 Seller Login
               </Link>
               <Link
-                href='/affiliate/login'
+                href='/auth/affiliate/login'
                 className='block w-full text-center px-6 py-2.5 bg-linear-to-r from-primary to-secondary text-white rounded-lg font-medium whitespace-nowrap'
               >
                 Affiliate Login

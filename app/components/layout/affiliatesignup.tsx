@@ -204,7 +204,7 @@ export default function AffiliateSignup() {
             <p className='text-center text-sm text-gray-600 mt-6'>
               Already have an account?{" "}
               <Link
-                href='/affiliate/login'
+                href='/auth/affiliate/login'
                 className='text-orange-600 font-semibold'
               >
                 Sign In

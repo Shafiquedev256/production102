@@ -6,18 +6,43 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const token = searchParams.get("token");
 
-    if (!token) return jsonResponse(null, 400, "Missing token");
+    if (!token) {
+      return jsonResponse(null, 400, "Missing verification token");
+    }
 
     const affiliates = await db.getCollection("affiliates");
 
-    const affiliate = await affiliates.findOne({ verificationToken: token });
-    if (!affiliate) return jsonResponse(null, 400, "Invalid or expired token");
+    // ✅ FIND BY CORRECT FIELD
+    const affiliate = await affiliates.findOne({
+      emailVerificationToken: token,
+    });
 
+    if (!affiliate) {
+      return jsonResponse(null, 400, "Invalid or expired token");
+    }
+
+    // ✅ CHECK EXPIRATION
+    if (
+      affiliate.emailVerificationExpires &&
+      affiliate.emailVerificationExpires < new Date()
+    ) {
+      return jsonResponse(null, 400, "Verification token has expired");
+    }
+
+    // ✅ VERIFY & CLEAN UP
     await affiliates.updateOne(
-      { verificationToken: token },
+      { _id: affiliate._id },
       {
-        $set: { isEmailVerified: true },
-        $unset: { verificationToken: "", verificationTokenIssuedAt: "" },
+        $set: {
+          isEmailVerified: true,
+          status: "active",
+          updatedAt: new Date(),
+        },
+        $unset: {
+          emailVerificationToken: "",
+          emailVerificationExpires: "",
+          emailVerificationIssuedAt: "",
+        },
       }
     );
 
