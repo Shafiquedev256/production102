@@ -38,12 +38,7 @@ export default function Sidebar({
         {/* Logo */}
         <div className='flex items-center justify-between px-6 py-5 border-b border-gray-200'>
           <div className='relative w-32 h-10'>
-            <Image
-              src='https://public.readdy.ai/ai/img_res/017300b4-3dda-4e39-b60b-8d9ca223f16c.png'
-              alt='Logo'
-              fill
-              className='object-contain'
-            />
+            <Image src='/logo.png' alt='Logo' fill className='object-contain' />
           </div>
           <button
             onClick={() => setIsSidebarOpen(false)}
