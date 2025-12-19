@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     // -----------------------------
     // Extract token from server-side cookies
     // -----------------------------
-    const token = req.cookies.get("token")?.value;
+    const token = req.cookies.get("accessToken")?.value;
     if (!token)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

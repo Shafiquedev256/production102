@@ -10,7 +10,7 @@ export default function AffiliateVerifySuccess() {
         </p>
 
         <a
-          href='/affiliate/login'
+          href='/auth/affiliate/login'
           className='bg-green-600 text-white px-5 py-3 rounded-lg hover:bg-green-700 transition'
         >
           Go to Login

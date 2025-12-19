@@ -26,7 +26,7 @@ export default function VerifySellerClient() {
         });
 
         if (res.ok || res.status === 302) {
-          router.push("/seller/verify-success");
+          router.push("/auth/seller/verify-success");
           return;
         }
 

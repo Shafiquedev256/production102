@@ -26,6 +26,7 @@ export default function AffiliateLogin() {
       const response = await fetch("/api/auth/affiliate/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
@@ -189,7 +190,7 @@ export default function AffiliateLogin() {
             <p className='text-center text-sm text-gray-600 mt-6'>
               Don't have an account?{" "}
               <Link
-                href='/affiliate/signup'
+                href='/auth/affiliate/signup'
                 className='text-orange-600 font-semibold'
               >
                 Sign Up

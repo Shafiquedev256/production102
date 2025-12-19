@@ -13,5 +13,5 @@ export const useProtectedSeller = () => {
     }
   }, [isLoading, isError, seller, router]);
 
-  return { seller, isLoading, refetch };
+  return { seller, isLoading, refetch, isError };
 };

@@ -25,7 +25,7 @@ export default function VerifyAffiliateEmail() {
         const data = await res.json();
 
         if (res.ok) {
-          router.push("/affiliate/verify-success");
+          router.push("/auth/affiliate/verify-success");
         } else {
           setStatus(data?.message || "Verification failed");
         }
