@@ -1,6 +1,6 @@
 "use client";
 import Analytics from "../../components/dashboard/seller/Analytics";
-import Header from "../../components/dashboard/seller/Header";
+import Header from "../../components/dashboard/seller/header";
 import Overview from "../../components/dashboard/seller/overview";
 import Payments from "../../components/dashboard/seller/Payments";
 import Products from "../../components/dashboard/seller/product";
